@@ -171,10 +171,13 @@ const MACROS={calories:2150,protein:190,carbs:210,fat:70};
 
 // ─── STORAGE ────────────────────────────────────────────────────────────────
 const STORAGE_KEY="whoop-coach-v6";
+const FOOD_KEY="whoop-food-v1";
 const TODAY=new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short",year:"2-digit"});
 
 function loadLog(){try{const r=localStorage.getItem(STORAGE_KEY);return r?JSON.parse(r):{}}catch(e){return{}}}
 function saveLog(log){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(log))}catch(e){}}
+function loadFood(){try{const r=localStorage.getItem(FOOD_KEY);return r?JSON.parse(r):{}}catch(e){return{}}}
+function saveFood(f){try{localStorage.setItem(FOOD_KEY,JSON.stringify(f))}catch(e){}}
 
 // ─── COACHING LOGIC ──────────────────────────────────────────────────────────
 function getCoaching(rec,hv,st,sl){
@@ -316,6 +319,149 @@ function ExerciseRow({ex,log,setLog,openEx,setOpenEx}){
   );
 }
 
+// ─── FOOD LOG (MFP end-of-day entry) ────────────────────────────────────────
+function FoodTab({foodLog,setFoodLog}){
+  const[cal,setCal]=useState("");
+  const[protein,setProtein]=useState("");
+  const[carbs,setCarbs]=useState("");
+  const[fat,setFat]=useState("");
+  const[water,setWater]=useState("");
+  const[saved,setSaved]=useState(false);
+  const[viewDate,setViewDate]=useState(TODAY);
+  const[showHistory,setShowHistory]=useState(false);
+
+  // Pre-fill form if entry exists for today
+  React.useEffect(()=>{
+    const e=foodLog[viewDate];
+    if(e){setCal(e.cal||"");setProtein(e.protein||"");setCarbs(e.carbs||"");setFat(e.fat||"");setWater(e.water||"");}
+    else{setCal("");setProtein("");setCarbs("");setFat("");setWater("");}
+    setSaved(false);
+  },[viewDate,foodLog]);
+
+  const saveEntry=()=>{
+    if(!cal)return;
+    const entry={cal:parseInt(cal)||0,protein:parseInt(protein)||0,carbs:parseInt(carbs)||0,fat:parseInt(fat)||0,water:parseFloat(water)||0};
+    setFoodLog(prev=>{const u={...prev,[viewDate]:entry};saveFood(u);return u;});
+    setSaved(true);setTimeout(()=>setSaved(false),2000);
+  };
+
+  const deleteEntry=(date)=>{
+    setFoodLog(prev=>{const u={...prev};delete u[date];saveFood(u);return u;});
+  };
+
+  const allDates=[...new Set(Object.keys(foodLog))].sort((a,b)=>{
+    const pa=a.split(" ");const pb=b.split(" ");
+    return new Date(pb[1]+" "+pb[0]+" "+pb[2])-new Date(pa[1]+" "+pa[0]+" "+pa[2]);
+  });
+
+  const inp2={background:"#111",border:"1px solid #2a2a2a",borderRadius:6,padding:"12px",color:"#f0f0f0",fontFamily:"inherit",fontSize:16,boxSizing:"border-box",width:"100%"};
+  const lbl2={fontSize:9,letterSpacing:2,color:"#555",marginBottom:6};
+
+  const MacroBar=({label,val,target,color})=>{
+    const pct=Math.min((val/target)*100,100);const over=val>target;
+    return h("div",{style:{marginBottom:8}},
+      h("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:4}},
+        h("span",{style:{fontSize:10,letterSpacing:2,color:"#555"}},label),
+        h("span",{style:{fontSize:11,color:over?"#f87171":color}},val+"g / "+target+"g"+(over?" ↑":""))
+      ),
+      h("div",{style:{height:3,background:"#1a1a1a",borderRadius:2}},
+        h("div",{style:{height:"100%",width:pct+"%",background:over?"#f87171":color,borderRadius:2,transition:"width 0.3s"}})
+      )
+    );
+  };
+
+  const todayEntry=foodLog[TODAY];
+  const calPct=todayEntry?Math.min((todayEntry.cal/MACROS.calories)*100,100):0;
+  const calOver=todayEntry&&todayEntry.cal>MACROS.calories;
+
+  return h("div",null,
+
+    // Tab header
+    h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}},
+      h("div",{style:{fontSize:10,letterSpacing:3,color:"#555"}},showHistory?"ALL DAYS":"LOG FROM MYFITNESSPAL"),
+      h("button",{onClick:()=>setShowHistory(!showHistory),
+        style:{background:"none",border:"1px solid #2a2a2a",borderRadius:4,padding:"5px 10px",color:"#555",fontFamily:"inherit",fontSize:9,letterSpacing:2}},
+        showHistory?"LOG":"HISTORY")
+    ),
+
+    !showHistory&&h("div",null,
+
+      // Today summary card if logged
+      todayEntry&&viewDate===TODAY&&h("div",{style:{padding:"16px",background:"#111",borderRadius:8,border:"1px solid #1f1f1f",marginBottom:16}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:10}},
+          h("div",null,
+            h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:4}},"TODAY"),
+            h("div",{style:{fontSize:30,fontWeight:700,color:calOver?"#f87171":"#f0f0f0"}},todayEntry.cal,h("span",{style:{fontSize:13,color:"#555",marginLeft:4}},"kcal")),
+          ),
+          h("div",{style:{textAlign:"right",fontSize:12}},
+            h("div",{style:{color:calOver?"#f87171":"#4ade80",fontWeight:700}},calOver?"+"+(todayEntry.cal-MACROS.calories)+" over":(MACROS.calories-todayEntry.cal)+" left"),
+            h("div",{style:{color:"#444",marginTop:2}},"target "+MACROS.calories)
+          )
+        ),
+        h("div",{style:{height:4,background:"#1a1a1a",borderRadius:2,marginBottom:12}},
+          h("div",{style:{height:"100%",width:calPct+"%",background:calOver?"#f87171":"#4ade80",borderRadius:2}})
+        ),
+        h(MacroBar,{label:"PROTEIN",val:todayEntry.protein,target:MACROS.protein,color:"#a78bfa"}),
+        h(MacroBar,{label:"CARBS",val:todayEntry.carbs,target:MACROS.carbs,color:"#60a5fa"}),
+        h(MacroBar,{label:"FAT",val:todayEntry.fat,target:MACROS.fat,color:"#f59e0b"}),
+        todayEntry.water>0&&h("div",{style:{fontSize:11,color:"#555",marginTop:8}},"💧 "+todayEntry.water+"L water")
+      ),
+
+      // Entry form
+      h("div",{style:{padding:"16px",background:"#0d0d0d",borderRadius:8,border:"1px solid #1a1a1a",marginBottom:16}},
+        h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:12}},viewDate===TODAY?"ENTER TODAY'S TOTALS FROM MFP":"EDITING — "+viewDate),
+        h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
+          h("div",null,h("div",{style:lbl2},"CALORIES"),h("input",{type:"number",inputMode:"numeric",value:cal,onChange:e=>setCal(e.target.value),placeholder:"e.g. 2150",style:inp2})),
+          h("div",null,h("div",{style:lbl2},"PROTEIN (g)"),h("input",{type:"number",inputMode:"numeric",value:protein,onChange:e=>setProtein(e.target.value),placeholder:"e.g. 190",style:inp2})),
+          h("div",null,h("div",{style:lbl2},"CARBS (g)"),h("input",{type:"number",inputMode:"numeric",value:carbs,onChange:e=>setCarbs(e.target.value),placeholder:"e.g. 210",style:inp2})),
+          h("div",null,h("div",{style:lbl2},"FAT (g)"),h("input",{type:"number",inputMode:"numeric",value:fat,onChange:e=>setFat(e.target.value),placeholder:"e.g. 70",style:inp2}))
+        ),
+        h("div",{style:{marginBottom:12}},
+          h("div",{style:lbl2},"WATER (litres, optional)"),
+          h("input",{type:"number",inputMode:"decimal",value:water,onChange:e=>setWater(e.target.value),placeholder:"e.g. 2.5",style:inp2})
+        ),
+        h("button",{onClick:saveEntry,disabled:!cal,
+          style:{width:"100%",padding:"13px",background:cal?"#f0f0f0":"#141414",color:cal?"#0a0a0a":"#444",border:"none",borderRadius:6,fontSize:11,fontWeight:700,letterSpacing:2}},
+          saved?"SAVED ✓":"SAVE DAY")
+      ),
+
+      h("div",{style:{fontSize:10,color:"#333",textAlign:"center",marginBottom:8}},"Copy totals from MyFitnessPal diary and paste here end of day")
+    ),
+
+    // History
+    showHistory&&h("div",null,
+      allDates.length===0&&h("div",{style:{textAlign:"center",padding:"40px 0",color:"#333",fontSize:13}},"No days logged yet."),
+      allDates.map(date=>{
+        const e=foodLog[date];if(!e)return null;
+        const isToday=date===TODAY;
+        const over=e.cal>MACROS.calories;
+        const pct=Math.min((e.cal/MACROS.calories)*100,100);
+        return h("div",{key:date,style:{marginBottom:10,padding:"14px",background:"#0d0d0d",borderRadius:8,border:isToday?"1px solid #333":"1px solid #1a1a1a"}},
+          h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
+            h("div",{style:{fontSize:12,color:isToday?"#f0f0f0":"#aaa",fontWeight:isToday?700:400}},date+(isToday?" · TODAY":"")),
+            h("div",{style:{display:"flex",gap:8}},
+              h("button",{onClick:()=>{setViewDate(date);setShowHistory(false)},
+                style:{background:"none",border:"1px solid #2a2a2a",borderRadius:4,padding:"4px 8px",color:"#555",fontFamily:"inherit",fontSize:9,letterSpacing:1}},"EDIT"),
+              h("button",{onClick:()=>deleteEntry(date),
+                style:{background:"none",border:"none",color:"#2a2a2a",fontFamily:"inherit",fontSize:12,padding:"4px 6px"}},"×")
+            )
+          ),
+          h("div",{style:{display:"flex",gap:14,fontSize:12,marginBottom:8}},
+            h("span",{style:{color:over?"#f87171":"#4ade80",fontWeight:700}},e.cal+" kcal"),
+            h("span",{style:{color:"#a78bfa"}},e.protein+"g P"),
+            h("span",{style:{color:"#60a5fa"}},e.carbs+"g C"),
+            h("span",{style:{color:"#f59e0b"}},e.fat+"g F"),
+            e.water&&h("span",{style:{color:"#555"}},"💧"+e.water+"L")
+          ),
+          h("div",{style:{height:3,background:"#1a1a1a",borderRadius:2}},
+            h("div",{style:{height:"100%",width:pct+"%",background:over?"#f87171":"#4ade80",borderRadius:2}})
+          )
+        );
+      })
+    )
+  );
+}
+
 // ─── MAIN APP ────────────────────────────────────────────────────────────────
 function App(){
   const todayIdx=(()=>{const d=new Date().getDay();return{6:0,0:1,1:2,2:3,3:4,4:5,5:6}[d]})();
@@ -328,6 +474,7 @@ function App(){
   const[sleep,setSleep]=useState("");
   const[submitted,setSubmitted]=useState(false);
   const[log,setLog]=useState(loadLog);
+  const[foodLog,setFoodLog]=useState(loadFood);
   const[openEx,setOpenEx]=useState(null);
   const[progEx,setProgEx]=useState(null);
 
@@ -346,7 +493,7 @@ function App(){
   };
 
   const exportData=()=>{
-    const blob=new Blob([JSON.stringify(log,null,2)],{type:"application/json"});
+    const blob=new Blob([JSON.stringify({workoutLog:log,foodLog},null,2)],{type:"application/json"});
     const url=URL.createObjectURL(blob);
     const a=document.createElement("a");
     a.href=url;a.download="coach-log-"+TODAY.replace(/ /g,"-")+".json";
@@ -357,15 +504,19 @@ function App(){
     const file=e.target.files[0];if(!file)return;
     const reader=new FileReader();
     reader.onload=(ev)=>{
-      try{setLog(JSON.parse(ev.target.result));alert("Imported.")}
-      catch(err){alert("Import failed.")}
+      try{
+        const data=JSON.parse(ev.target.result);
+        if(data.workoutLog){setLog(data.workoutLog);saveLog(data.workoutLog);}
+        if(data.foodLog){setFoodLog(data.foodLog);saveFood(data.foodLog);}
+        alert("Imported.");
+      }catch(err){alert("Import failed.");}
     };
     reader.readAsText(file);
   };
 
   const inp={background:"#111",border:"1px solid #2a2a2a",borderRadius:6,padding:"12px",color:"#f0f0f0",fontFamily:"inherit",fontSize:16,boxSizing:"border-box",width:"100%"};
   const lbl={fontSize:9,letterSpacing:2,color:"#555",marginBottom:6};
-  const TABS=["COACH","PROGRESS","FUEL"];
+  const TABS=["COACH","FOOD","PROGRESS","FUEL"];
 
   return h("div",{style:{minHeight:"100vh",background:"#0a0a0a"}},
 
@@ -477,6 +628,9 @@ function App(){
           )
         )
       ),
+
+      // ── FOOD TAB ──────────────────────────────────────────────────────────
+      tab==="FOOD"&&h(FoodTab,{foodLog,setFoodLog}),
 
       // ── PROGRESS TAB ──────────────────────────────────────────────────────
       tab==="PROGRESS"&&h("div",null,
