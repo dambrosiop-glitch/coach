@@ -172,12 +172,27 @@ const MACROS={calories:2150,protein:190,carbs:210,fat:70};
 // ─── STORAGE ────────────────────────────────────────────────────────────────
 const STORAGE_KEY="whoop-coach-v6";
 const FOOD_KEY="whoop-food-v1";
+const BODY_KEY="whoop-body-v1";
 const TODAY=new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short",year:"2-digit"});
 
 function loadLog(){try{const r=localStorage.getItem(STORAGE_KEY);return r?JSON.parse(r):{}}catch(e){return{}}}
 function saveLog(log){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(log))}catch(e){}}
 function loadFood(){try{const r=localStorage.getItem(FOOD_KEY);return r?JSON.parse(r):{}}catch(e){return{}}}
 function saveFood(f){try{localStorage.setItem(FOOD_KEY,JSON.stringify(f))}catch(e){}}
+function loadBody(){
+  try{
+    const r=localStorage.getItem(BODY_KEY);
+    if(r)return JSON.parse(r);
+    // Seed with known weight history
+    const seed=[
+      {date:"Start",weight:92.5,note:"Starting weight",photos:{}},
+      {date:"Mid",weight:91.7,note:"",photos:{}},
+      {date:"12 Jun 26",weight:91.3,note:"",photos:{}},
+    ];
+    saveBody(seed);return seed;
+  }catch(e){return[];}
+}
+function saveBody(b){try{localStorage.setItem(BODY_KEY,JSON.stringify(b))}catch(e){}}
 
 // ─── COACHING LOGIC ──────────────────────────────────────────────────────────
 function getCoaching(rec,hv,st,sl){
@@ -316,6 +331,162 @@ function ExerciseRow({ex,log,setLog,openEx,setOpenEx}){
       )
     ),
     isOpen&&h(InlineLogger,{exName:ex.name,log,setLog})
+  );
+}
+
+// ─── BODY TAB — Weight + Photos ──────────────────────────────────────────────
+function BodyTab({bodyLog,setBodyLog}){
+  const[weight,setWeight]=useState("");
+  const[note,setNote]=useState("");
+  const[saved,setSaved]=useState(false);
+  const[photos,setPhotos]=useState({front:null,back:null,side:null});
+  const[viewIdx,setViewIdx]=useState(null);
+  const[activeAngle,setActiveAngle]=useState("front");
+
+  const addEntry=()=>{
+    if(!weight)return;
+    const entry={date:TODAY,weight:parseFloat(weight),note,photos:{}};
+    // Embed photos as base64 strings
+    Object.entries(photos).forEach(([angle,data])=>{if(data)entry.photos[angle]=data;});
+    const updated=[...bodyLog,entry];
+    setBodyLog(updated);saveBody(updated);
+    setWeight("");setNote("");setPhotos({front:null,back:null,side:null});
+    setSaved(true);setTimeout(()=>setSaved(false),2000);
+  };
+
+  const deleteEntry=(idx)=>{
+    const updated=bodyLog.filter((_,i)=>i!==idx);
+    setBodyLog(updated);saveBody(updated);
+    if(viewIdx===idx)setViewIdx(null);
+  };
+
+  const handlePhoto=(angle,e)=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=(ev)=>setPhotos(p=>({...p,[angle]:ev.target.result}));
+    reader.readAsDataURL(file);
+  };
+
+  const startWeight=bodyLog.length?bodyLog[0].weight:null;
+  const latestWeight=bodyLog.length?bodyLog[bodyLog.length-1].weight:null;
+  const totalChange=startWeight&&latestWeight?Math.round((latestWeight-startWeight)*10)/10:null;
+
+  // Mini weight chart
+  const chartData=bodyLog.slice(-12);
+  const weights=chartData.map(e=>e.weight);
+  const minW=weights.length?Math.min(...weights)-1:85;
+  const maxW=weights.length?Math.max(...weights)+1:95;
+  const range=maxW-minW||1;
+
+  const inp2={background:"#111",border:"1px solid #2a2a2a",borderRadius:6,padding:"12px",color:"#f0f0f0",fontFamily:"inherit",fontSize:16,boxSizing:"border-box",width:"100%"};
+  const lbl2={fontSize:9,letterSpacing:2,color:"#555",marginBottom:6};
+  const ANGLES=["front","back","side"];
+
+  return h("div",null,
+
+    // Summary card
+    bodyLog.length>0&&h("div",{style:{padding:"16px",background:"#111",borderRadius:8,border:"1px solid #1f1f1f",marginBottom:16}},
+      h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:14}},
+        h("div",null,
+          h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:4}},"CURRENT WEIGHT"),
+          h("div",{style:{fontSize:32,fontWeight:700,color:"#f0f0f0"}},latestWeight,h("span",{style:{fontSize:14,color:"#555",marginLeft:4}},"kg"))
+        ),
+        totalChange!==null&&h("div",{style:{textAlign:"right"}},
+          h("div",{style:{fontSize:11,color:"#555",marginBottom:2}},"from start"),
+          h("div",{style:{fontSize:18,fontWeight:700,color:totalChange<0?"#4ade80":totalChange>0?"#f87171":"#aaa"}},
+            (totalChange>0?"+":"")+totalChange+"kg")
+        )
+      ),
+      // Weight chart
+      weights.length>1&&h("div",{style:{height:60,display:"flex",alignItems:"flex-end",gap:3,marginBottom:4}},
+        chartData.map((e,i)=>{
+          const ht=Math.max(4,((e.weight-minW)/range)*56);
+          const isLatest=i===chartData.length-1;
+          return h("div",{key:i,style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2}},
+            isLatest&&h("div",{style:{fontSize:8,color:"#4ade80"}}),e.weight,
+            h("div",{style:{width:"100%",height:ht,background:isLatest?"#4ade80":"#222",borderRadius:"2px 2px 0 0"}})
+          );
+        })
+      ),
+      weights.length>1&&h("div",{style:{display:"flex",justifyContent:"space-between",fontSize:9,color:"#333"}},
+        h("span",null,chartData[0]?.date),
+        h("span",null,chartData[chartData.length-1]?.date)
+      )
+    ),
+
+    // Log new entry
+    h("div",{style:{padding:"16px",background:"#0d0d0d",borderRadius:8,border:"1px solid #1a1a1a",marginBottom:16}},
+      h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:12}},"LOG TODAY"),
+      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}},
+        h("div",null,h("div",{style:lbl2},"WEIGHT (kg)"),
+          h("input",{type:"number",inputMode:"decimal",value:weight,onChange:e=>setWeight(e.target.value),placeholder:"e.g. 91.3",style:inp2})),
+        h("div",null,h("div",{style:lbl2},"NOTE (optional)"),
+          h("input",{type:"text",value:note,onChange:e=>setNote(e.target.value),placeholder:"e.g. morning",style:inp2}))
+      ),
+
+      // Photo upload buttons
+      h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:8}},"PROGRESS PHOTOS (optional)"),
+      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:12}},
+        ANGLES.map(angle=>h("div",{key:angle},
+          h("label",{style:{display:"block",cursor:"pointer"}},
+            photos[angle]
+              ? h("div",{style:{position:"relative"}},
+                  h("img",{src:photos[angle],style:{width:"100%",aspectRatio:"3/4",objectFit:"cover",borderRadius:6,border:"1px solid #4ade80"}}),
+                  h("div",{style:{position:"absolute",bottom:4,left:0,right:0,textAlign:"center",fontSize:9,color:"#4ade80",letterSpacing:1}},angle.toUpperCase())
+                )
+              : h("div",{style:{aspectRatio:"3/4",background:"#111",borderRadius:6,border:"1px dashed #2a2a2a",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4}},
+                  h("div",{style:{fontSize:18,color:"#333"}},"+"),
+                  h("div",{style:{fontSize:9,color:"#444",letterSpacing:1}},angle.toUpperCase())
+                ),
+            h("input",{type:"file",accept:"image/*",capture:"environment",onChange:e=>handlePhoto(angle,e),style:{display:"none"}})
+          )
+        ))
+      ),
+
+      h("button",{onClick:addEntry,disabled:!weight,
+        style:{width:"100%",padding:"13px",background:weight?"#f0f0f0":"#141414",color:weight?"#0a0a0a":"#444",border:"none",borderRadius:6,fontSize:11,fontWeight:700,letterSpacing:2}},
+        saved?"SAVED ✓":"SAVE ENTRY")
+    ),
+
+    // History list
+    bodyLog.length>0&&h("div",null,
+      h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:12}},"HISTORY"),
+      [...bodyLog].reverse().map((entry,ri)=>{
+        const idx=bodyLog.length-1-ri;
+        const isSelected=viewIdx===idx;
+        const hasPhotos=Object.keys(entry.photos||{}).length>0;
+        const prev=idx>0?bodyLog[idx-1]:null;
+        const diff=prev?Math.round((entry.weight-prev.weight)*10)/10:null;
+        return h("div",{key:idx,style:{marginBottom:10,background:"#0d0d0d",borderRadius:8,border:"1px solid #1a1a1a",overflow:"hidden"}},
+          h("div",{onClick:()=>setViewIdx(isSelected?null:idx),
+            style:{padding:"13px 14px",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}},
+            h("div",null,
+              h("div",{style:{display:"flex",alignItems:"center",gap:10,marginBottom:2}},
+                h("span",{style:{fontSize:14,fontWeight:700,color:"#f0f0f0"}},entry.weight+"kg"),
+                diff!==null&&h("span",{style:{fontSize:11,color:diff<0?"#4ade80":diff>0?"#f87171":"#555"}},(diff>0?"+":"")+diff+"kg"),
+                hasPhotos&&h("span",{style:{fontSize:10,color:"#555"}},"\uD83D\uDCF7")
+              ),
+              h("div",{style:{fontSize:11,color:"#444"}},entry.date+(entry.note?" · "+entry.note:""))
+            ),
+            h("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+              h("span",{style:{fontSize:12,color:isSelected?"#f0f0f0":"#333"}},isSelected?"▲":"▼"),
+              h("button",{onClick:e=>{e.stopPropagation();deleteEntry(idx)},
+                style:{background:"none",border:"none",color:"#2a2a2a",fontSize:14,padding:"2px 6px"}},"×")
+            )
+          ),
+          isSelected&&hasPhotos&&h("div",{style:{padding:"0 14px 14px"}},
+            h("div",{style:{display:"flex",gap:6,marginBottom:8}},
+              ANGLES.map(angle=>entry.photos[angle]&&h("button",{key:angle,onClick:()=>setActiveAngle(angle),
+                style:{flex:1,padding:"6px",background:activeAngle===angle?"#f0f0f0":"#111",color:activeAngle===angle?"#0a0a0a":"#555",border:"1px solid #2a2a2a",borderRadius:4,fontSize:9,letterSpacing:1,fontFamily:"inherit"}},
+                angle.toUpperCase()))
+            ),
+            entry.photos[activeAngle]&&h("img",{src:entry.photos[activeAngle],style:{width:"100%",maxHeight:400,objectFit:"contain",borderRadius:6}})
+          )
+        );
+      })
+    ),
+
+    bodyLog.length===0&&h("div",{style:{textAlign:"center",padding:"40px 0",color:"#333",fontSize:13}},"No entries yet. Log your first weigh-in above.")
   );
 }
 
@@ -475,6 +646,7 @@ function App(){
   const[submitted,setSubmitted]=useState(false);
   const[log,setLog]=useState(loadLog);
   const[foodLog,setFoodLog]=useState(loadFood);
+  const[bodyLog,setBodyLog]=useState(loadBody);
   const[openEx,setOpenEx]=useState(null);
   const[progEx,setProgEx]=useState(null);
 
@@ -493,7 +665,7 @@ function App(){
   };
 
   const exportData=()=>{
-    const blob=new Blob([JSON.stringify({workoutLog:log,foodLog},null,2)],{type:"application/json"});
+    const blob=new Blob([JSON.stringify({workoutLog:log,foodLog,bodyLog},null,2)],{type:"application/json"});
     const url=URL.createObjectURL(blob);
     const a=document.createElement("a");
     a.href=url;a.download="coach-log-"+TODAY.replace(/ /g,"-")+".json";
@@ -508,6 +680,7 @@ function App(){
         const data=JSON.parse(ev.target.result);
         if(data.workoutLog){setLog(data.workoutLog);saveLog(data.workoutLog);}
         if(data.foodLog){setFoodLog(data.foodLog);saveFood(data.foodLog);}
+        if(data.bodyLog){setBodyLog(data.bodyLog);saveBody(data.bodyLog);}
         alert("Imported.");
       }catch(err){alert("Import failed.");}
     };
@@ -516,7 +689,7 @@ function App(){
 
   const inp={background:"#111",border:"1px solid #2a2a2a",borderRadius:6,padding:"12px",color:"#f0f0f0",fontFamily:"inherit",fontSize:16,boxSizing:"border-box",width:"100%"};
   const lbl={fontSize:9,letterSpacing:2,color:"#555",marginBottom:6};
-  const TABS=["COACH","FOOD","PROGRESS","FUEL"];
+  const TABS=["COACH","FOOD","BODY","LIFTS","FUEL"];
 
   return h("div",{style:{minHeight:"100vh",background:"#0a0a0a"}},
 
@@ -632,8 +805,11 @@ function App(){
       // ── FOOD TAB ──────────────────────────────────────────────────────────
       tab==="FOOD"&&h(FoodTab,{foodLog,setFoodLog}),
 
-      // ── PROGRESS TAB ──────────────────────────────────────────────────────
-      tab==="PROGRESS"&&h("div",null,
+      // ── BODY TAB ──────────────────────────────────────────────────────────
+      tab==="BODY"&&h(BodyTab,{bodyLog,setBodyLog}),
+
+      // ── LIFTS TAB ─────────────────────────────────────────────────────────
+      tab==="LIFTS"&&h("div",null,
         h("div",{style:{fontSize:10,letterSpacing:3,color:"#555",marginBottom:16}},"ALL EXERCISE PRS"),
         Object.entries(SESSIONS).map(([sName,s])=>h("div",{key:sName,style:{marginBottom:24}},
           h("div",{style:{fontSize:10,letterSpacing:2,color:"#333",marginBottom:10,paddingBottom:8,borderBottom:"1px solid #1a1a1a"}},sName.toUpperCase()),
