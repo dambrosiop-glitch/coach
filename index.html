@@ -46,7 +46,7 @@ const SPLIT=[
   {day:"Tue",session:"Upper B",type:"work"},
   {day:"Wed",session:"Lower B",type:"work"},
   {day:"Thu",session:"REST",type:"rest"},
-  {day:"Fri",session:"REST",type:"rest"},
+  {day:"Fri",session:"Detail Day",type:"work"},
 ];
 
 const SESSIONS={
@@ -64,14 +64,14 @@ const SESSIONS={
       {title:"CHEST — PRIMARY",color:"#60a5fa",
        note:"Main compound first while fresh. 90s rest.",
        exercises:[
-         {name:"Incline Chest Press",sets:"4",reps:"6-8",note:"Upper chest sweep. 1-2 RIR on all sets. Progressive overload focus",x:true},
+         {name:"Incline Chest Press",sets:"4",reps:"8-10",note:"Upper chest sweep. 1-2 RIR on all sets. Progressive overload focus",x:true},
          {name:"Cable Chest Fly",sets:"3",reps:"12-15",note:"Stretch and squeeze. Pause 1s at stretch. Last set: drop set"},
        ]},
       {title:"BACK — SECOND HIT",color:"#34d399",
        note:"Back gets volume here, priority day Tuesday.",
        exercises:[
-         {name:"Cable Row",sets:"3",reps:"8-10",note:"Mid-back thickness. Full stretch at front. 1 sec pause contracted"},
-         {name:"Cable Pullover",sets:"3",reps:"12-15",note:"Lat width + serratus. X frame driver. Last set: lengthened partials",x:true},
+         {name:"Cable Row",sets:"4",reps:"10",note:"Mid-back thickness. Full stretch at front. 1 sec pause contracted"},
+         {name:"Cable Pullover",sets:"3",reps:"12",note:"Lat width + serratus. X frame driver. Last set: lengthened partials",x:true},
        ]},
       {title:"SIDE DELTS — BLITZ",color:"#f59e0b",
        note:"7 sets. The X-frame width driver. No rest between cable and DB — rest 60s after the pair.",
@@ -89,19 +89,19 @@ const SESSIONS={
       {title:"QUAD COMPOUND",color:"#4ade80",
        note:"Primary lower body compound first. 2 min rest.",
        exercises:[
-         {name:"Hack Squat",sets:"4",reps:"6-8",note:"Deep ROM, heels elevated. Quad sweep priority. 1-2 RIR",x:true},
-         {name:"Leg Press",sets:"3",reps:"10-12",note:"Wide stance, outer quad. Last set: drop set — strip 20% and go again"},
+         {name:"Hack Squat",sets:"4",reps:"8",note:"Deep ROM, heels elevated. Quad sweep priority. 1-2 RIR",x:true},
+         {name:"Single Leg Press",sets:"3",reps:"10 each",note:"Unilateral — outer quad focus. Controls knee stress after hack squat. Last set: drop set"},
        ]},
       {title:"SUPERSET B — QUAD/HAMS",color:"#4ade80",
        note:"B1 then B2 immediately, 60s rest after pair.",
        exercises:[
-         {name:"Leg Extension",sets:"3",reps:"15-20",note:"B1 — VMO focus. Full extension, squeeze. Lengthened partials on last set"},
-         {name:"Hamstring Curl",sets:"3",reps:"12-15",note:"B2 — full ROM. Slow eccentric 3 seconds"},
+         {name:"Single Leg Extension",sets:"3",reps:"12-15 each",note:"B1 — VMO focus. Full extension, squeeze. Unilateral — fixes imbalances"},
+         {name:"Hamstring Curl",sets:"3",reps:"12",note:"B2 — full ROM. Slow eccentric 3 seconds"},
        ]},
       {title:"GLUTE WIDTH — CLOSER",color:"#f59e0b",
        note:"Hip width = bottom of X frame. Finish here.",
        exercises:[
-         {name:"Hip Abductor Machine",sets:"4",reps:"15-20",note:"Slow and controlled. Last set: drop set. X frame hip width",x:true},
+         {name:"Standing Cable Hip Abduction",sets:"3",reps:"15 each",note:"Ankle strap, low pulley. Stand side-on. No stack limit. X frame",x:true},
          {name:"Reverse Lunge (DB)",sets:"3",reps:"10 each",note:"Glute activation. Step back, drive through heel"},
        ]},
     ],
@@ -114,25 +114,25 @@ const SESSIONS={
       {title:"SUPERSET A — ARMS",color:"#a78bfa",
        note:"A1 then A2 immediately, 75s rest after pair. 3 rounds.",
        exercises:[
-         {name:"Cable Curl",sets:"3",reps:"10-12",note:"A1 — constant tension full ROM. Last set: drop set"},
-         {name:"Tricep Pushdown V-Bar",sets:"3",reps:"12-15",note:"A2 — elbows pinned, strict. Squeeze at bottom"},
+         {name:"Cable Curl",sets:"3",reps:"12",note:"A1 — constant tension full ROM. Last set: drop set"},
+         {name:"Tricep Pushdown V-Bar",sets:"3",reps:"12",note:"A2 — elbows pinned, strict. Squeeze at bottom"},
        ]},
       {title:"BACK — PRIMARY",color:"#34d399",
        note:"Back priority today. 90s rest on pull ups.",
        exercises:[
          {name:"Weighted Pull Up",sets:"4",reps:"6-10",note:"Lat width. Add weight when you hit 10 clean reps. 1-2 RIR",x:true},
-         {name:"Cable Row",sets:"3",reps:"8-10",note:"Vary grip from Saturday — use neutral or wide"},
+         {name:"Cable Row",sets:"4",reps:"10",note:"Vary grip from Saturday — use neutral or wide"},
        ]},
       {title:"CHEST — SECOND HIT",color:"#60a5fa",
        note:"Different angle to Saturday's incline.",
        exercises:[
-         {name:"DB Flat Press",sets:"3",reps:"8-10",note:"Mid chest. Full ROM, touch chest. 1-2 RIR"},
-         {name:"DB Shoulder Press",sets:"3",reps:"8-10",note:"Overhead width. Neutral grip. Full ROM"},
+         {name:"DB Flat Press",sets:"3",reps:"10",note:"Mid chest. Full ROM, touch chest. 1-2 RIR"},
+         {name:"DB Shoulder Press",sets:"3",reps:"10",note:"Overhead width. Neutral grip. Full ROM"},
        ]},
       {title:"REAR DELT + DELT FINISHER",color:"#f59e0b",
        note:"Superset face pull + lateral raise. 60s rest after pair.",
        exercises:[
-         {name:"Face Pull (rope)",sets:"3",reps:"15-20",note:"Upper chest height. External rotation at face. Rear delt + rotator cuff"},
+         {name:"Face Pull (rope)",sets:"3",reps:"15",note:"Upper chest height. External rotation at face. Rear delt + rotator cuff"},
          {name:"Cable Lateral Raise",sets:"3",reps:"12-15",note:"Second weekly delt hit. Last set: lengthened partials",x:true},
          {name:"Hammer Curl",sets:"3",reps:"10-12",note:"Brachialis thickness. Drop set on last set"},
        ]},
@@ -144,16 +144,16 @@ const SESSIONS={
     duration:"~55 min",
     blocks:[
       {title:"POSTERIOR COMPOUND",color:"#4ade80",
-       note:"Hip hinge first. 2 min rest. This is your second lower compound of the week.",
+       note:"Hip hinge first. 2 min rest.",
        exercises:[
-         {name:"Romanian Deadlift",sets:"4",reps:"6-8",note:"Hamstring stretch priority. Slow 3s eccentric. 1-2 RIR",x:true},
-         {name:"Hamstring Curl",sets:"4",reps:"12-15",note:"Full ROM. Last set: drop set — strip and keep going"},
+         {name:"Romanian Deadlift",sets:"4",reps:"8",note:"Hamstring stretch priority. Slow 3s eccentric. 1-2 RIR",x:true},
+         {name:"Hamstring Curl",sets:"4",reps:"12",note:"Full ROM. Last set: drop set — strip and keep going"},
        ]},
       {title:"SUPERSET B — QUAD/GLUTE",color:"#4ade80",
        note:"B1 then B2 immediately, 60s rest after pair.",
        exercises:[
-         {name:"Leg Extension",sets:"3",reps:"15-20",note:"B1 — quad detail, VMO. Partials at failure"},
-         {name:"Hip Abductor Machine",sets:"3",reps:"15-20",note:"B2 — glute medius. Hip width. X frame",x:true},
+         {name:"Single Leg Extension",sets:"3",reps:"12-15 each",note:"B1 — quad detail, VMO. Unilateral — no stack limit"},
+         {name:"Standing Cable Hip Abduction",sets:"3",reps:"15 each",note:"B2 — glute medius. Hip width. X frame",x:true},
        ]},
       {title:"CORE — WEIGHTED",color:"#ef4444",
        note:"Progressive overload on abs — load these like any other muscle.",
@@ -161,6 +161,43 @@ const SESSIONS={
          {name:"Cable Crunch (kneeling)",sets:"4",reps:"12-15",note:"Load heavy. Round spine fully. Add weight weekly"},
          {name:"Hanging Leg Raise",sets:"3",reps:"10-15",note:"Dead hang. Posterior pelvic tilt at top. No swinging"},
          {name:"Ab Wheel Rollout",sets:"3",reps:"8-12",note:"Anti-extension. Full stretch, don't let hips drop"},
+       ]},
+    ],
+  },
+  "Detail Day":{
+    label:"Detail Day — Arms, Shoulders, Chest & Core",
+    focus:"Third stimulus on priority muscles · isolation focus · pump",
+    duration:"~50 min",
+    blocks:[
+      {title:"SUPERSET A — BICEPS/TRICEPS",color:"#a78bfa",
+       note:"A1/A2 back to back, 60s rest after pair. 3 rounds.",
+       exercises:[
+         {name:"Single Arm Cable Curl",sets:"3",reps:"12 each",note:"A1 — unilateral, full supination. Squeeze at top"},
+         {name:"Tricep Overhead Rope Extension",sets:"3",reps:"12-15",note:"A2 — rope attachment, long head stretch. Full extension"},
+       ]},
+      {title:"SUPERSET B — BICEPS/TRICEPS",color:"#a78bfa",
+       note:"B1/B2 back to back, 60s rest after pair. 3 rounds.",
+       exercises:[
+         {name:"Hammer Curl",sets:"3",reps:"10-12",note:"B1 — brachialis and forearm thickness"},
+         {name:"Tricep Dips",sets:"3",reps:"10-15",note:"B2 — bodyweight or assisted. Full depth. Lean slightly forward"},
+       ]},
+      {title:"SHOULDERS",color:"#f59e0b",
+       note:"Side and rear delt detail — X frame width.",
+       exercises:[
+         {name:"DB Shoulder Press",sets:"3",reps:"10-12",note:"Overhead compound. Full ROM"},
+         {name:"Cable Y Raise",sets:"3",reps:"12-15",note:"Low pulley, arms at 45 degrees. Rear delt + lower trap. Slow and controlled"},
+       ]},
+      {title:"CHEST + BACK DETAIL",color:"#60a5fa",
+       note:"Mid chest isolation and posterior chain.",
+       exercises:[
+         {name:"Cable Chest Fly",sets:"3",reps:"12-15",note:"Mid chest. Stretch and squeeze. Pause at full stretch"},
+         {name:"Back Extension (weighted)",sets:"3",reps:"12-15",note:"Hold plate or DB. Lower back + glutes. Controlled"},
+       ]},
+      {title:"CORE + POSTERIOR",color:"#ef4444",
+       note:"Finish strong.",
+       exercises:[
+         {name:"Hanging Leg Raise",sets:"3",reps:"10-15",note:"Dead hang. Posterior pelvic tilt at top"},
+         {name:"Single Leg RDL",sets:"3",reps:"10 each",note:"Light DB, balance focus. Hamstring + glute. Control the descent"},
        ]},
     ],
   },
@@ -173,6 +210,7 @@ const MACROS={calories:2150,protein:190,carbs:210,fat:70};
 const STORAGE_KEY="whoop-coach-v6";
 const FOOD_KEY="whoop-food-v1";
 const BODY_KEY="whoop-body-v1";
+const CARDIO_KEY="whoop-cardio-v1";
 const TODAY=new Date().toLocaleDateString("en-AU",{day:"2-digit",month:"short",year:"2-digit"});
 
 function loadLog(){try{const r=localStorage.getItem(STORAGE_KEY);return r?JSON.parse(r):{}}catch(e){return{}}}
@@ -193,6 +231,147 @@ function loadBody(){
   }catch(e){return[];}
 }
 function saveBody(b){try{localStorage.setItem(BODY_KEY,JSON.stringify(b))}catch(e){}}
+function loadCardio(){try{const r=localStorage.getItem(CARDIO_KEY);return r?JSON.parse(r):[]}catch(e){return[]}}
+function saveCardio(c){try{localStorage.setItem(CARDIO_KEY,JSON.stringify(c))}catch(e){}}
+
+// ─── CARDIO TAB ──────────────────────────────────────────────────────────────
+function CardioTab({cardioLog,setCardioLog}){
+  const[date,setDate]=useState(TODAY);
+  const[type,setType]=useState("Run");
+  const[duration,setDuration]=useState("");
+  const[calories,setCalories]=useState("");
+  const[avgHR,setAvgHR]=useState("");
+  const[kms,setKms]=useState("");
+  const[notes,setNotes]=useState("");
+  const[saved,setSaved]=useState(false);
+
+  const TYPES=["Run","Treadmill","Row","Ski Erg","Bike","Swim","HIIT","Walk","Other"];
+
+  const addEntry=()=>{
+    if(!duration&&!calories)return;
+    const entry={
+      id:Date.now(),date,type,
+      duration:duration||null,
+      calories:calories?parseInt(calories):null,
+      avgHR:avgHR?parseInt(avgHR):null,
+      kms:kms?parseFloat(kms):null,
+      notes
+    };
+    const updated=[entry,...cardioLog];
+    setCardioLog(updated);saveCardio(updated);
+    setDuration("");setCalories("");setAvgHR("");setKms("");setNotes("");
+    setSaved(true);setTimeout(()=>setSaved(false),2000);
+  };
+
+  const deleteEntry=(id)=>{
+    const updated=cardioLog.filter(e=>e.id!==id);
+    setCardioLog(updated);saveCardio(updated);
+  };
+
+  const totalCalThisWeek=cardioLog.filter(e=>{
+    const entryDate=new Date(e.date.split(" ").reverse().join("-"));
+    const now=new Date();
+    const weekAgo=new Date(now.getTime()-7*24*60*60*1000);
+    return entryDate>=weekAgo;
+  }).reduce((sum,e)=>sum+(e.calories||0),0);
+
+  const inp2={background:"#111",border:"1px solid #2a2a2a",borderRadius:6,padding:"12px",color:"#f0f0f0",fontFamily:"inherit",fontSize:16,boxSizing:"border-box",width:"100%"};
+  const lbl2={fontSize:9,letterSpacing:2,color:"#555",marginBottom:6};
+
+  return h("div",null,
+    h("div",{style:{fontSize:10,letterSpacing:3,color:"#555",marginBottom:14}},"CARDIO LOG"),
+
+    // Weekly summary
+    cardioLog.length>0&&h("div",{style:{padding:"14px 16px",background:"#111",borderRadius:8,border:"1px solid #1f1f1f",marginBottom:16,display:"flex",justifyContent:"space-between",alignItems:"center"}},
+      h("div",null,
+        h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:4}},"THIS WEEK"),
+        h("div",{style:{fontSize:24,fontWeight:700,color:"#4ade80"}},totalCalThisWeek,h("span",{style:{fontSize:12,color:"#555",marginLeft:4}},"kcal burned")),
+        h("div",{style:{fontSize:11,color:"#444",marginTop:2}},cardioLog.filter(e=>{
+          const ed=new Date(e.date.split(" ").reverse().join("-"));
+          return ed>=new Date(new Date().getTime()-7*24*60*60*1000);
+        }).length+" sessions")
+      ),
+      h("div",{style:{fontSize:10,color:"#555",textAlign:"right"}},"7 day\nrolling")
+    ),
+
+    // Entry form
+    h("div",{style:{padding:"16px",background:"#0d0d0d",borderRadius:8,border:"1px solid #1a1a1a",marginBottom:16}},
+      h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:12}},"LOG SESSION"),
+
+      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
+        h("div",null,
+          h("div",{style:lbl2},"DATE"),
+          h("input",{type:"text",value:date,onChange:e=>setDate(e.target.value),placeholder:"e.g. 28 Jun 26",style:inp2})
+        ),
+        h("div",null,
+          h("div",{style:lbl2},"TYPE"),
+          h("select",{value:type,onChange:e=>setType(e.target.value),style:{...inp2,appearance:"none"}},
+            TYPES.map(t=>h("option",{key:t,value:t},t)))
+        )
+      ),
+
+      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
+        h("div",null,
+          h("div",{style:lbl2},"DURATION (min)"),
+          h("input",{type:"number",inputMode:"numeric",value:duration,onChange:e=>setDuration(e.target.value),placeholder:"e.g. 30",style:inp2})
+        ),
+        h("div",null,
+          h("div",{style:lbl2},"CALORIES"),
+          h("input",{type:"number",inputMode:"numeric",value:calories,onChange:e=>setCalories(e.target.value),placeholder:"e.g. 350",style:inp2})
+        )
+      ),
+
+      h("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
+        h("div",null,
+          h("div",{style:lbl2},"AVG HEART RATE"),
+          h("input",{type:"number",inputMode:"numeric",value:avgHR,onChange:e=>setAvgHR(e.target.value),placeholder:"e.g. 142",style:inp2})
+        ),
+        h("div",null,
+          h("div",{style:lbl2},"DISTANCE (km)"),
+          h("input",{type:"number",inputMode:"decimal",value:kms,onChange:e=>setKms(e.target.value),placeholder:"e.g. 5.2",style:inp2})
+        )
+      ),
+
+      h("div",{style:{marginBottom:12}},
+        h("div",{style:lbl2},"NOTES (optional)"),
+        h("input",{type:"text",value:notes,onChange:e=>setNotes(e.target.value),placeholder:"e.g. felt strong, treadmill 1% incline",style:inp2})
+      ),
+
+      h("button",{onClick:addEntry,disabled:!duration&&!calories,
+        style:{width:"100%",padding:"13px",
+          background:duration||calories?"#f0f0f0":"#141414",
+          color:duration||calories?"#0a0a0a":"#444",
+          border:"none",borderRadius:6,fontSize:11,fontWeight:700,letterSpacing:2}},
+        saved?"SAVED ✓":"SAVE SESSION")
+    ),
+
+    // History
+    cardioLog.length>0&&h("div",null,
+      h("div",{style:{fontSize:10,letterSpacing:2,color:"#555",marginBottom:12}},"HISTORY"),
+      cardioLog.map(e=>h("div",{key:e.id,style:{marginBottom:8,padding:"13px 14px",background:"#0d0d0d",borderRadius:8,border:"1px solid #1a1a1a"}},
+        h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}},
+          h("div",null,
+            h("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:3}},
+              h("span",{style:{fontSize:13,fontWeight:700,color:"#f0f0f0"}},e.type),
+              h("span",{style:{fontSize:11,color:"#555"}},e.date)
+            ),
+            h("div",{style:{display:"flex",gap:14,flexWrap:"wrap",fontSize:12}},
+              e.duration&&h("span",{style:{color:"#aaa"}},e.duration+"min"),
+              e.calories&&h("span",{style:{color:"#4ade80",fontWeight:700}},e.calories+" kcal"),
+              e.avgHR&&h("span",{style:{color:"#f87171"}},e.avgHR+" bpm avg"),
+              e.kms&&h("span",{style:{color:"#60a5fa"}},e.kms+"km")
+            ),
+            e.notes&&h("div",{style:{fontSize:11,color:"#444",marginTop:4}},e.notes)
+          ),
+          h("button",{onClick:()=>deleteEntry(e.id),
+            style:{background:"none",border:"none",color:"#2a2a2a",fontSize:14,padding:"2px 6px"}},"×")
+        )
+      ))
+    ),
+
+    cardioLog.length===0&&h("div",{style:{textAlign:"center",padding:"40px 0",color:"#333",fontSize:13}},"No cardio logged yet.")
+  );
+}
 
 // ─── COACHING LOGIC ──────────────────────────────────────────────────────────
 function getCoaching(rec,hv,st,sl){
@@ -647,6 +826,7 @@ function App(){
   const[log,setLog]=useState(loadLog);
   const[foodLog,setFoodLog]=useState(loadFood);
   const[bodyLog,setBodyLog]=useState(loadBody);
+  const[cardioLog,setCardioLog]=useState(loadCardio);
   const[openEx,setOpenEx]=useState(null);
   const[progEx,setProgEx]=useState(null);
 
@@ -665,7 +845,7 @@ function App(){
   };
 
   const exportData=()=>{
-    const blob=new Blob([JSON.stringify({workoutLog:log,foodLog,bodyLog},null,2)],{type:"application/json"});
+    const blob=new Blob([JSON.stringify({workoutLog:log,foodLog,bodyLog,cardioLog},null,2)],{type:"application/json"});
     const url=URL.createObjectURL(blob);
     const a=document.createElement("a");
     a.href=url;a.download="coach-log-"+TODAY.replace(/ /g,"-")+".json";
@@ -681,6 +861,7 @@ function App(){
         if(data.workoutLog){setLog(data.workoutLog);saveLog(data.workoutLog);}
         if(data.foodLog){setFoodLog(data.foodLog);saveFood(data.foodLog);}
         if(data.bodyLog){setBodyLog(data.bodyLog);saveBody(data.bodyLog);}
+        if(data.cardioLog){setCardioLog(data.cardioLog);saveCardio(data.cardioLog);}
         alert("Imported.");
       }catch(err){alert("Import failed.");}
     };
@@ -689,7 +870,7 @@ function App(){
 
   const inp={background:"#111",border:"1px solid #2a2a2a",borderRadius:6,padding:"12px",color:"#f0f0f0",fontFamily:"inherit",fontSize:16,boxSizing:"border-box",width:"100%"};
   const lbl={fontSize:9,letterSpacing:2,color:"#555",marginBottom:6};
-  const TABS=["COACH","FOOD","BODY","LIFTS","FUEL"];
+  const TABS=["COACH","FOOD","BODY","CARDIO","LIFTS","FUEL"];
 
   return h("div",{style:{minHeight:"100vh",background:"#0a0a0a"}},
 
@@ -807,6 +988,9 @@ function App(){
 
       // ── BODY TAB ──────────────────────────────────────────────────────────
       tab==="BODY"&&h(BodyTab,{bodyLog,setBodyLog}),
+
+      // ── CARDIO TAB ────────────────────────────────────────────────────────
+      tab==="CARDIO"&&h(CardioTab,{cardioLog,setCardioLog}),
 
       // ── LIFTS TAB ─────────────────────────────────────────────────────────
       tab==="LIFTS"&&h("div",null,
